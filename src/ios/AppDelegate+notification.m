@@ -223,7 +223,11 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
         case UIApplicationStateInactive:
         {
             NSLog(@"coldstart");
-            self.launchNotification = response.notification.request.content.userInfo;
+            if([userInfo[@"actionCallback"]isEqualToString:@"com.apple.UNNotificationDefaultActionIdentifier"] ) {
+                self.launchNotification = response.notification.request.content.userInfo;
+            } else {
+                self.launchNotification = userInfo;
+            }
             self.coldstart = [NSNumber numberWithBool:YES];
             break;
         }
