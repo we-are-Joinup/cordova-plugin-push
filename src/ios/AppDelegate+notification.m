@@ -62,9 +62,13 @@ NSString *const pushPluginApplicationDidBecomeActiveNotification = @"pushPluginA
                                             selector:@selector(pushPluginOnApplicationDidBecomeActive:)
                                                 name:UIApplicationDidBecomeActiveNotification
                                               object:nil];
-
-    // This actually calls the original init method over in AppDelegate. Equivilent to calling super
-    // on an overrided method, this is not recursive, although it appears that way. neat huh?
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onFinishLaunching:)
+                                                 name:UIApplicationDidFinishLaunchingNotification
+                                               object:nil];
+  
+    // This actually calls the original init method over in AppDelegate. Equivalent to calling super
+    // on an override method, this is not recursive, although it appears that way. neat huh?
     return [self pushPluginSwizzledInit];
 }
 
@@ -85,6 +89,12 @@ NSString *const pushPluginApplicationDidBecomeActiveNotification = @"pushPluginA
     if (application.applicationState != UIApplicationStateActive) {
 
         NSLog(@"app in-active");
+
+        #if defined(__IPHONE_14_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_14_0
+            if (application.applicationState == UIApplicationStateBackground && self.launchNotification != nil) {
+                exit(0);
+            }
+        #endif
 
         // do some convoluted logic to find out if this should be a silent push.
         long silent = 0;
@@ -198,6 +208,14 @@ NSString *const pushPluginApplicationDidBecomeActiveNotification = @"pushPluginA
     [pushHandler notificationReceived];
 
     completionHandler(UNNotificationPresentationOptionNone);
+}
+
+/**@
+ * on UIApplicationDidFinishLaunchingNotification
+ */
+-(void) onFinishLaunching:(NSNotification *)notification
+{
+    self.launchNotification = [notification userInfo];
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
