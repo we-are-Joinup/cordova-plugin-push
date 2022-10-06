@@ -2,16 +2,14 @@
 
 - [Installation](#installation)
   - [Installation Requirements](#installation-requirements)
+    - [Cordova-Android 9.x Specifics](#cordova-android-9x-specifics)
   - [Android details](#android-details)
-    - [Compilation](#compilation)
     - [Co-existing with Facebook Plugin](#co-existing-with-facebook-plugin)
     - [Co-existing with plugins that use Firebase](#co-existing-with-plugins-that-use-firebase)
     - [Common errors](#common-errors)
-      - [minSdkVersion === 14](#minsdkversion--14)
       - [Multidex](#multidex)
       - [More than one library with package name 'com.google.android.gms'](#more-than-one-library-with-package-name-comgoogleandroidgms)
   - [Browser details](#browser-details)
-    - [Browser quirks](#browser-quirks)
     - [Browser Support](#browser-support)
   - [iOS details](#ios-details)
     - [System & Cordova Requirements](#system--cordova-requirements)
@@ -26,56 +24,37 @@
 
 | Plugin version | Cordova CLI | Cordova Android | Cordova iOS | CocoaPods |
 | -------------- | ----------- | --------------- | ----------- | --------- |
-| 2.2.0          | 7.1.0       | 7.1.0           | 4.5.0       | 1.1.1     |
-| 2.1.2          | 7.1.0       | 6.3.0           | 4.5.0       | 1.1.1     |
-| 2.1.0          | 7.1.0       | 6.3.0           | 4.4.0       | 1.1.1     |
-| 2.0.0          | 7.0.0       | 6.2.1           | 4.4.0       | 1.1.1     |
-| 1.9.0          | 6.4.0       | 6.0.0           | 4.3.0       | 1.1.1     |
-| 1.8.0          | 3.6.3       | 4.0.0           | 4.1.0       | N/A       |
+| 1.0.0          | 10.0.0      | 8.0.0           | 5.1.1       | 1.8.0     |
+| 2.0.0          | 10.0.0      | 8.0.0           | 6.0.0       | 1.8.0     |
+| 3.0.0          | 10.0.0      | 9.0.0           | 6.0.0       | 1.8.0     |
 
 To install from the command line:
 
 ```bash
-phonegap plugin add phonegap-plugin-push
+cordova plugin add @havesource/cordova-plugin-push
 ```
+
+It is also possible to install via repo url directly (unstable)
 
 or
 
 ```bash
-cordova plugin add phonegap-plugin-push
+cordova plugin add github:havesource/cordova-plugin-push
 ```
 
-It is also possible to install via repo url directly ( unstable )
+To configure the `SENDER_ID`, place your `google-services.json` (Android) and/or `GoogleService-Info.plist` in the root folder of your project and then add the following lines into your config.xml.
 
-```bash
-phonegap plugin add https://github.com/phonegap/phonegap-plugin-push
-```
+In the `platform` tag for Android add the following `resource-file` tag if you are using `cordova-android` 8.0 or greater:
 
-or
-
-```bash
-cordova plugin add https://github.com/phonegap/phonegap-plugin-push
-```
-
-As of version 2.0.0 the SENDER_ID parameter has been removed at install time. Instead you put your google-services.json (Android) and/or GoogleService-Info.plist in the root folder of your project and then add the following lines into your config.xml.
-
-In the platform tag for Android add the following resource-file tag if you are using cordova-android 7.0 or greater:
+E.g.
 
 ```xml
 <platform name="android">
-  <resource-file src="google-services.json" target="app/google-services.json" />
+  <resource-file src="google-services.json" target="/app/google-services.json" />
 </platform>
 ```
 
-If you are using cordova-android 6.x or earlier, add the following resource-file tag:
-
-```xml
-<platform name="android">
-  <resource-file src="google-services.json" target="google-services.json" />
-</platform>
-```
-
-By default, on iOS, the plugin will register with APNS. If you want to use FCM on iOS, in the platform tag for iOS add the resource-file tag:
+By default, on iOS, the plugin will register with APNS. If you want to use FCM on iOS, in the `platform` tag for iOS add the following `resource-file` tag:
 
 ```xml
 <platform name="ios">
@@ -96,26 +75,22 @@ By default, on iOS, the plugin will register with APNS. If you want to use FCM o
 > Note: You need to specify the SENDER_ID variable in your config.xml if you plan on installing/restoring plugins using the prepare method. The prepare method will skip installing the plugin otherwise.
 
 ```xml
-<plugin name="phonegap-plugin-push" spec="2.0.0" />
+<plugin name="@havesource/cordova-plugin-push" spec="3.0.0" />
 ```
+
+### Cordova-Android 9.x Specifics
+
+**Using AndroidX Library:**
+
+As of version **3.0.0**, this plugin has migrated from the Android Support Library to AndroidX. Since Cordova-Android 9.x does not use the AndroidX library by default, you will need to install the [`cordova-plugin-androidx-adapter`](https://www.npmjs.com/package/cordova-plugin-androidx-adapter) plugin.
+
+This plugin will migrate any Android Support Library references to AndroidX.
+
+Please note that this will also migrate references of other plugins.
+
+If you are using **Cordova Android 8.x** please continue reading in the **Cordova Android 8.x Specifics** section.
 
 ## Android details
-
-### Compilation
-
-As of version 2.1.0 the plugin has been switched to using pinned version of Gradle libraries. You will need to ensure that you have installed the following items through the Android SDK Manager:
-
-* Android Support Repository version 47+
-
-![android support library](https://user-images.githubusercontent.com/353180/33042340-7ea60aaa-ce0f-11e7-99f7-4631e4c3d7be.png)
-
-For more detailed instructions on how to install the Android Support Library visit [Google's documentation](https://developer.android.com/tools/support-library/setup.html).
-
-_Note:_ if you are using an IDE to like Eclipse, Xamarin, etc. then the Android SDK installed by those tools may not be the same version as the one used by the Cordova/PhoneGap CLI while building. Please make sure your command line tooling is up to date with the software versions above. An easy way to make sure you up to date is to run the following command:
-
-```bash
-android update sdk --no-ui --filter "extra"
-```
 
 ### Co-existing with Facebook Plugin
 
@@ -124,13 +99,7 @@ There are a number of Cordova Facebook Plugins available but the one that we rec
 To add to your app:
 
 ```bash
-phonegap plugin add --save cordova-plugin-facebook4 --variable APP_ID="App ID" --variable APP_NAME="App Name"
-```
-
-or
-
-```bash
-cordova plugin add --save cordova-plugin-facebook4 --variable APP_ID="App ID" --variable APP_NAME="App Name"
+cordova plugin add cordova-plugin-facebook4 --variable APP_ID="App ID" --variable APP_NAME="App Name"
 ```
 
 ### Co-existing with plugins that use Firebase
@@ -146,8 +115,8 @@ To make the two work together, you need to migrate your GCM project from Google 
 {
   "cordova": {
     "plugins": {
-      "havesource-cordova-plugin-push": {
-        "ANDROID_SUPPORT_V13_VERSION": "27.+",
+      "@havesource/cordova-plugin-push": {
+        "ANDROIDX_CORE_VERSION": "1.6.+",
         "FCM_VERSION": "18.+"
       }
     },
@@ -161,34 +130,6 @@ _Note:_ No changes on the back-end side are needed: [even though recommended](ht
 _Note:_ The `FCM_VERSION` must be greater than or equal to 17.1.0 and less than or equal to 18.0.0.
 
 ### Common errors
-
-#### minSdkVersion === 14
-
-If you have an issue compiling the app and you are getting an error similar to this:
-
-```
-* What went wrong:
-Execution failed for task ':processDebugManifest'.
-> Manifest merger failed : uses-sdk:minSdkVersion 14 cannot be smaller than version 15 declared in library .../platforms/android/build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.6.0/AndroidManifest.xml
-  	Suggestion: use tools:overrideLibrary="com.facebook" to force usage
-```
-
-Then you can add the following entry into your config.xml file in the android platform tag:
-
-```xml
-<platform name="android">
-    <preference name="android-minSdkVersion" value="15"/>
- </platform>
-```
-
-or compile your project using the following command, if the solution above doesn't work for you. Basically add `-- --minSdkVersion=15` to the end of the command line (mind the extra `--`, it's needed):
-
-```bash
-cordova compile android -- --minSdkVersion=15
-cordova build android -- --minSdkVersion=15
-cordova run android -- --minSdkVersion=15
-cordova emulate android -- --minSdkVersion=15
-```
 
 #### Multidex
 
@@ -217,7 +158,7 @@ Common plugins to suffer from this outdated dependency management are plugins re
 
 #### More than one library with package name 'com.google.android.gms'
 
-When some other packages include `cordova-google-play-services` as a dependency, such as is the case with the cordova-admob and cordova-plugin-analytics plugins, it is impossible to also add the phonegap-plugin-push, for the following error will rise during the build process:
+When some other packages include `cordova-google-play-services` as a dependency, such as is the case with the `cordova-admob` and `cordova-plugin-analytics` plugins, it is impossible to also add the `@havesource/cordova-plugin-push`, for the following error will rise during the build process:
 
 ```
 :processDebugResources FAILED
@@ -237,11 +178,7 @@ Alternatively, switch to another plugin that provides the same functionality but
 
 ## Browser details
 
-### Browser quirks
-
-For the time being push support on the browser will only work using the PhoneGap push server.
-
-When you run `phonegap serve` to test browser push point your browser at `http://localhost:3000`. The browser push implementation uses the W3C Push Spec's implementation which relies on ServiceWorkers and ServiceWorkers can only be accessed via the `https` protocol or via `http://localhost`. Pointing your browser at `localhost` will be the easiest way to test.
+For the time being, push support on the browser is not supported. The original plugin used the PhoneGap push server which may no longer be active.
 
 ### Browser Support
 
@@ -260,8 +197,8 @@ Firefox 46+
 
 **Cordova:**
 
-- `cordova-cli`: `9.0.0` or greater. Preferably `10.x`
-- `cordova-ios`: `5.1.1` or greater. Preferably `6.1.x`
+- `cordova-cli`: `10.0.0` or greater.
+- `cordova-ios`: `6.0.0` or greater. Preferably `6.1.x`
 
 ### Bitcode
 
@@ -271,11 +208,11 @@ If you are running into a problem where the linker is complaining about bit code
 ld: '<file.o>' does not contain bitcode. You must rebuild it with bitcode enabled (Xcode setting ENABLE_BITCODE), obtain an updated library from the vendor, or disable bitcode for this target. for architecture arm64 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 ```
 
-You have two options. The first is to [disable bitcode as per this StackOverflow answer](http://stackoverflow.com/a/32466484/41679) or [upgrade to cordova-ios 5.1.1 or greater](https://cordova.apache.org/announcements/2019/12/02/cordova-ios-release-5.1.1.html).
+You have two options. The first is to [disable bitcode as per this StackOverflow answer](http://stackoverflow.com/a/32466484/41679) or [upgrade to cordova-ios 6.0.0 or greater](https://cordova.apache.org/announcements/2020/06/01/cordova-ios-release-6.0.0.html).
 
 ```bash
 cordova platform rm ios
-cordova platform add ios@5.1.1
+cordova platform add ios@6.0.0
 ```
 
 ### CocoaPods
@@ -291,8 +228,8 @@ This plugin uses the [Firebase/Messaging](https://cocoapods.org/pods/Firebase) l
 If you are attempting to install this plugin and you run into this error:
 
 ```log
-Installing "havesource-cordova-plugin-push" for ios
-Failed to install 'havesource-cordova-plugin-push':Error: pod: Command failed with exit code 1
+Installing "@havesource/cordova-plugin-push" for ios
+Failed to install '@havesource/cordova-plugin-push':Error: pod: Command failed with exit code 1
     at ChildProcess.whenDone (/Users/smacdona/code/push151/platforms/ios/cordova/node_modules/cordova-common/src/superspawn.js:169:23)
     at emitTwo (events.js:87:13)
     at ChildProcess.emit (events.js:172:7)
